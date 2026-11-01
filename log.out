@@ -1,0 +1,91 @@
+[vladblednov@red-lab /]$ sudo groupadd students
+[vladblednov@red-lab /]$ sudo useradd -u 1234 -g students -m -s /bin/bash user1
+[vladblednov@red-lab /]$ sudo passwd user1
+Изменение пароля пользователя user1.
+Новый пароль:
+НЕУДАЧНЫЙ ПАРОЛЬ: Пароль должен содержать не менее 8 символов
+Повторите ввод нового пароля:
+Извините, но пароли не совпадают.
+passwd: Ошибка при операциях с маркером проверки подлинности
+[vladblednov@red-lab /]$ sudo passwd user1
+Изменение пароля пользователя user1.
+Новый пароль:
+НЕУДАЧНЫЙ ПАРОЛЬ: Пароль не прошел проверку орфографии - на основе слова из словаря
+Повторите ввод нового пароля:
+passwd: данные аутентификации успешно обновлены.
+[vladblednov@red-lab /]$ sudo chage -M 90 user1
+[vladblednov@red-lab /]$ id user1
+uid=1234(user1) gid=1002(students) группы=1002(students)
+[vladblednov@red-lab /]$ chage -l user1
+chage: доступ запрещён.
+[vladblednov@red-lab /]$ sudo chage -l user1
+Последний раз пароль был изменён                                : ноя 01, 2026
+Срок действия пароля истекает                                   : янв 30, 2027
+Пароль будет деактивирован через                                : никогда
+Срок действия учётной записи истекает                           : никогда
+Минимальное количество дней между сменой пароля                 : 0
+Максимальное количество дней между сменой пароля                : 90
+Количество дней с предупреждением перед деактивацией пароля     : 7
+[vladblednov@red-lab /]$ sudo find / -perm -4000 -type f 2>/dev/null > ~/setuid_files.out
+[vladblednov@red-lab /]$ wc -l ~/setuid_files.out
+30 /home/vladblednov/setuid_files.out
+[vladblednov@red-lab /]$ head ~/setuid_files.out
+/usr/sbin/pam_timestamp_check
+/usr/sbin/mount.nfs
+/usr/sbin/grub2-set-bootflag
+/usr/sbin/userhelper
+/usr/sbin/unix_chkpwd
+/usr/libexec/spice-gtk-x86_64/spice-client-glib-usb-acl-helper
+/usr/libexec/Xorg.wrap
+/usr/libexec/xf86-video-intel-backlight-helper
+/usr/libexec/dbus-1/dbus-daemon-launch-helper
+/usr/lib/polkit-1/polkit-agent-helper-1
+[vladblednov@red-lab /]$ ps -eo pid,ruid,euid,comm --sort=pid | awk '$2 >= 1000 && $3 == 0' > ~/privileged_processes.out
+[vladblednov@red-lab /]$ cat ~/privileged_processes.out
+[vladblednov@red-lab /]$ ps -eo pid,ruid,euid,comm --sort=pid | awk '$2 >= 1000 && $3 == 0' > ~/privileged_processes.out
+[vladblednov@red-lab /]$ cat ~/privileged_processes.out
+ 110995  1001     0 passwd
+[vladblednov@red-lab /]$ cp /usr/bin/cat ~/mycat
+[vladblednov@red-lab /]$ sudo chown root:root ~/mycat
+[vladblednov@red-lab /]$ sudo chmod u+s ~/mycat
+[vladblednov@red-lab /]$ ls -l ~/mycat
+-rwsr-xr-x. 1 root root 36568 ноя  1 08:48 /home/vladblednov/mycat
+[vladblednov@red-lab /]$ ~/mycat /etc/shadow | head -n 1
+root:$y$j9T$VjqzT1iLAZkFyDS.fk/OuO/.$4jIH..SP4RfBAhZdQuygtQEAUkJ00TbJFgA/slmeFQB::0:99999:7:::
+[vladblednov@red-lab /]$ cp /usr/bin/chown ~/mychown
+[vladblednov@red-lab /]$ sudo chown root:root ~/mychown
+[vladblednov@red-lab /]$ sudo setcap cap_chown=ep ~/mychown
+[vladblednov@red-lab /]$ getcap ~/mychown
+/home/vladblednov/mychown cap_chown=ep
+[vladblednov@red-lab /]$ touch ~/testfile
+[vladblednov@red-lab /]$ ~/mychown user1 ~/testfile
+[vladblednov@red-lab /]$ ls -l ~/testfile
+-rw-r--r--. 1 user1 vladblednov 0 ноя  1 08:57 /home/vladblednov/testfile
+[vladblednov@red-lab /]$ touch ~/testfile
+~/mychown user1 ~/testfile
+touch: невозможно выполнить touch для '/home/vladblednov/testfile': Отказано в доступе
+[vladblednov@red-lab /]$ command -v date
+/usr/bin/date
+[vladblednov@red-lab /]$ date
+Вс 01 ноя 2026 09:21:30 MSK
+[vladblednov@red-lab /]$ /usr/bin/date
+Вс 01 ноя 2026 09:21:39 MSK
+[vladblednov@red-lab /]$ sudo SUDO_EDITOR=nano visudo
+[vladblednov@red-lab /]$ sudo -l -U user1
+Соответствие записей Defaults для user1 на red-lab:
+    !visiblepw, always_set_home, match_group_by_gid, always_query_group_plugin, env_reset, env_keep="COLORS DISPLAY HOSTNAME HISTSIZE KDEDIR
+    LS_COLORS", env_keep+="MAIL PS1 PS2 QTDIR USERNAME LANG LC_ADDRESS LC_CTYPE", env_keep+="LC_COLLATE LC_IDENTIFICATION LC_MEASUREMENT
+    LC_MESSAGES", env_keep+="LC_MONETARY LC_NAME LC_NUMERIC LC_PAPER LC_TELEPHONE", env_keep+="LC_TIME LC_ALL LANGUAGE LINGUAS _XKB_CHARSET
+    XAUTHORITY", secure_path=/sbin\:/bin\:/usr/sbin\:/usr/bin
+
+Пользователь user1 может выполнять следующие команды на red-lab:
+    (root) /usr/bin/date
+[vladblednov@red-lab /]$ 372770
+bash: 372770: команда не найдена...
+[vladblednov@red-lab /]$ ^C
+[vladblednov@red-lab /]$ stat /home/user1 > ~/stat.out
+[vladblednov@red-lab /]$ stat ~/mycat   >> ~/stat.out
+[vladblednov@red-lab /]$ stat ~/mychown >> ~/stat.out
+[vladblednov@red-lab /]$ getcap ~/mychown > ~/getcap.out
+[vladblednov@red-lab /]$ history > ~/history.out
+[vladblednov@red-lab /]$ 

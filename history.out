@@ -1,0 +1,39 @@
+    1  sudo groupadd students
+    2  sudo useradd -u 1234 -g students -m -s /bin/bash user1
+    3  sudo passwd user1
+    4  sudo chage -M 90 user1
+    5  id user1
+    6  chage -l user1
+    7  sudo chage -l user1
+    8  sudo find / -perm -4000 -type f 2>/dev/null > ~/setuid_files.out
+    9  wc -l ~/setuid_files.out
+   10  head ~/setuid_files.out
+   11  ps -eo pid,ruid,euid,comm --sort=pid | awk '$2 >= 1000 && $3 == 0' > ~/privileged_processes.out
+   12  cat ~/privileged_processes.out
+   13  ps -eo pid,ruid,euid,comm --sort=pid | awk '$2 >= 1000 && $3 == 0' > ~/privileged_processes.out
+   14  cat ~/privileged_processes.out
+   15  cp /usr/bin/cat ~/mycat
+   16  sudo chown root:root ~/mycat
+   17  sudo chmod u+s ~/mycat
+   18  ls -l ~/mycat
+   19  ~/mycat /etc/shadow | head -n 1
+   20  cp /usr/bin/chown ~/mychown
+   21  sudo chown root:root ~/mychown
+   22  sudo setcap cap_chown=ep ~/mychown
+   23  getcap ~/mychown
+   24  touch ~/testfile
+   25  ~/mychown user1 ~/testfile
+   26  ls -l ~/testfile
+   27  touch ~/testfile
+   28  ~/mychown user1 ~/testfile
+   29  command -v date
+   30  date
+   31  /usr/bin/date
+   32  sudo SUDO_EDITOR=nano visudo
+   33  sudo -l -U user1
+   34  372770
+   35  stat /home/user1 > ~/stat.out
+   36  stat ~/mycat   >> ~/stat.out
+   37  stat ~/mychown >> ~/stat.out
+   38  getcap ~/mychown > ~/getcap.out
+   39  history > ~/history.out
